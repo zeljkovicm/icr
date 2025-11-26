@@ -4,11 +4,14 @@ import { throwError } from "rxjs";
 import { UserModel } from "../models/user.model";
 
 export class UserService {
+
+    public static USERS_KEY = 'icr_users'
+    public static ACTIVE_KEY = 'icr_active'
     // f-ja koja ce dopremiti spisak svih korsnika iz localStorage
 
     static getUsers(): UserModel[] {
-        if (!localStorage.getItem('icr_users')) {
-            localStorage.setItem('icr_users', JSON.stringify([
+        if (!localStorage.getItem(this.USERS_KEY)) {
+            localStorage.setItem(this.USERS_KEY, JSON.stringify([
                 {
                     firstName: "Example",
                     lastName: "User",
@@ -20,7 +23,7 @@ export class UserService {
             ]))
         }// mora se paziti sta ima u localStorage, mogu postojati iste vrednosti, moze se promeniti i port
 
-        return JSON.parse(localStorage.getItem('icr_users')!)
+        return JSON.parse(localStorage.getItem(this.USERS_KEY)!)
     }
 
     static findUserByEmail(email: string) {
@@ -36,11 +39,30 @@ export class UserService {
     static login(email: string, password: string) {
         try {
             const user = this.findUserByEmail(email)
-            return user.password === password
+            if (user.password === password) {
+                localStorage.setItem(this.ACTIVE_KEY, user.email)
+                return true
+            }
+            return false
         } catch {
             return false
         }
 
+    }
+
+    static hasAuth() {
+        return localStorage.getItem(this.ACTIVE_KEY) !== null
+    }
+
+    static getActiveUser() {
+        if (!this.hasAuth())
+            throw new Error()
+
+        return this.findUserByEmail(localStorage.getItem(this.ACTIVE_KEY)!)
+    }
+
+    static logout() {
+        localStorage.removeItem(this.ACTIVE_KEY)
     }
 }
 
