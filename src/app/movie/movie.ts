@@ -1,19 +1,21 @@
 import { Component, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLinkWithHref } from '@angular/router';
+import { MovieModel } from '../models/movie.model';
+import { MovieService } from '../services/movie.service';
 
 @Component({
   selector: 'app-movie',
-  imports: [],
+  imports: [RouterLinkWithHref],
   templateUrl: './movie.html',
   styleUrl: './movie.css',
 })
 export class Movie {
-  protected path = signal<string>('')
+  protected movie = signal<MovieModel | null>(null)
 
   constructor(private route: ActivatedRoute) {
     this.route.params.subscribe(p => {
       if (p['path']) {
-        this.path.set(p['path'])
+        MovieService.getMovieByPermalink(p['path']).then(rsp => this.movie.set(rsp.data))
       }
     })
   }
