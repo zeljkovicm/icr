@@ -26,4 +26,12 @@ export class Utils {
       }
     })
   }
+
+  public showAlert(text: string) {
+    Swal.fire({
+      icon: 'info',
+      title: text,
+      customClass: this.bootstrapClasses
+    })
+  }
 }
