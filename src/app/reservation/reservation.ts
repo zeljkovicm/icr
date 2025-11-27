@@ -4,6 +4,8 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkWithHref } from '@angular
 import { MovieModel } from '../models/movie.model';
 import { MovieService } from '../services/movie.service';
 import { UserService } from '../services/user.service';
+import { Utils } from '../utils';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-reservation',
@@ -16,7 +18,7 @@ export class Reservation {
 
   protected form: FormGroup
 
-  constructor(private route: ActivatedRoute, private router: Router, private builder: FormBuilder) {
+  constructor(private route: ActivatedRoute, private router: Router, private builder: FormBuilder, private utils: Utils) {
     this.route.params.subscribe(p => {
       if (p['path']) {
         const shortUrl = p['path']
@@ -37,6 +39,26 @@ export class Reservation {
   }
 
   protected onSubmit() {
+    if (!this.form.valid) {
+      this.utils.showAlert('Invalid form data')
+      return
+    }
 
+    if (!this.movie()) {
+      this.utils.showAlert('Movie hasn\'t been loaded yet!')
+      return
+    }
+    UserService.createReservation({
+      movieId: this.movie()!.movieId,
+      movieTitle: this.movie()!.title,
+      cinema: this.form.value.cinema,
+      hall: this.form.value.hall,
+      quantity: this.form.value.quantity,
+      status: 'na',
+      time: this.form.value.time,
+      orderId: uuidv4()
+    })
+
+    this.router.navigateByUrl('/profile')
   }
 }
