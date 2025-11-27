@@ -7,6 +7,7 @@ export class UserService {
 
     public static USERS_KEY = 'icr_users'
     public static ACTIVE_KEY = 'icr_active'
+    public static TO_KEY = 'icr_to'
     // f-ja koja ce dopremiti spisak svih korsnika iz localStorage
 
     static getUsers(): UserModel[] {

@@ -1,0 +1,64 @@
+@if (movie()) {
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a routerLink="/">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a [routerLink]="`/movie/${movie()?.shortUrl}`">{{movie()?.title}}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Reservation</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-12 col-md-4">
+        <img [src]="movie()?.poster" [alt]="movie()?.title" class="img-fluid">
+    </div>
+    <div class="col-12 col-md-8">
+        <div class="card">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="card-header">
+                    <h5><i class="fa-solid fa-film"></i> {{movie()?.title}}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="time" class="form-label">Vreme</label>
+                        <select id="time" class="form-select" formControlName="time">
+                            <option value="Utorak 22h">Utorak u 22:00</option>
+                            <option value="Sreda 21h">Sreda u 21:00</option>
+                            <option value="Petak 20h">Petak u 20:00</option>
+                            <option value="Petak 22h">Petak u 22:00</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cinema" class="form-label">Bioskop</label>
+                        <select id="cinema" class="form-select" formControlName="cinema">
+                            <option value="Usce">Usce Shopping Centar</option>
+                            <option value="Rakovica">BIG Rakovica</option>
+                            <option value="Rajiceva">Rajiceva</option>
+                            <option value="Ada">Ada Mall</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hall" class="form-label">Sala</label>
+                        <select id="hall" class="form-select" formControlName="hall">
+                            <option value="Velika">Velika sala</option>
+                            <option value="Mala">Mala sala</option>
+                            <option value="Privatna">Privatna (do 12 osoba)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Broj karata</label>
+                        <input type="number" class="form-control" id="quantity" formControlName="quantity">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary">
+                        <i class="fa-solid fa-cart-shopping"></i> Book Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
