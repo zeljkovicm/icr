@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { MovieService } from '../services/movie.service';
 
 @Component({
   selector: 'app-home',
@@ -7,5 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './home.css',
 })
 export class Home {
+  protected movies = signal<any>(null)
 
+  constructor() {
+    MovieService.getMovies().then(rsp => this.movies.set(JSON.stringify(rsp.data, null, 2)))
+  }
 }
