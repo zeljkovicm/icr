@@ -3,17 +3,78 @@ import { RouterLink, RouterOutlet, RouterLinkActive, Router } from '@angular/rou
 import Swal from 'sweetalert2';
 import { UserService } from './services/user.service';
 import { Utils } from './utils';
+import { MessageModel } from './models/message.model';
+import { throwIfEmpty } from 'rxjs';
+import { RasaService } from './services/rasa.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, FormsModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
   protected year = new Date().getFullYear()
+  protected isChatVisible: boolean = false
+  protected waitingForResponse: boolean = false
+  protected botThinkingPlaceHolder: string = "Thinking..."
+  protected userMessage: string = ""
+  protected messages: MessageModel[] = []
 
-  constructor(private router: Router, private utils: Utils) { }
+  constructor(private router: Router, private utils: Utils) {
+    this.messages.push({
+      type: 'bot',
+      text: 'How can I help you?'
+    })
+  }
+
+  toggleChat() {
+    this.isChatVisible = !this.isChatVisible
+  }
+
+  sendUserMessage() {
+    if (this.waitingForResponse) return
+
+    const trimmedMessage = this.userMessage.trim()
+    this.userMessage = ""
+
+    this.messages.push({
+      type: 'user',
+      text: trimmedMessage
+    })
+
+    this.messages.push({
+      type: 'bot',
+      text: this.botThinkingPlaceHolder
+    })
+
+    RasaService.sendMessage(trimmedMessage).then(rsp => {
+      if (rsp.data.length == 0) {
+        this.messages.push({
+          type: 'bot',
+          text: "Sorry, I didn't understand your question."
+        })
+        return
+      }
+
+      for (let message of rsp.data) {
+        this.messages.push({
+          type: 'bot',
+          text: message.text
+        })
+      }
+
+      this.messages = this.messages.filter(m => {
+        if (m.type == 'bot') {
+          return m.text != this.botThinkingPlaceHolder
+        }
+        return true
+      })
+
+    })
+
+  }
 
   getUserName() {
     const user = UserService.getActiveUser()
